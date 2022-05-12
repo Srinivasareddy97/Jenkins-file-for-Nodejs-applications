@@ -1,0 +1,31 @@
+pipeline {
+     agent any
+     stages {
+           stage('git clone') {
+              steps {
+                git branch: 'main', credentialsId: 'gh-deployJenkinsKeyForAdmin', url: 'git@github.com:AHS-Backend/admin-with-react.git'
+              }
+                
+           }
+           stage("Build") {
+              steps {
+                 sh "sudo npm install"
+               sh "sudo npm run build"
+              }
+            }
+           stage("Deploy") {
+            steps { sh '''
+                     kill -9 $(lsof -t -i:3000) || true
+               export JENKINS_NODE_COOKIE=dontKillMe
+                 nohup npm run start&
+               ''' }
+           }
+        }
+    }
+    
+    
+    
+    
+    
+    
+    https://medium.com/swlh/setup-a-ci-cd-pipeline-to-automate-react-app-deployment-on-aws-ec2-82bd0c194f77
